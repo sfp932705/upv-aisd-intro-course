@@ -1,9 +1,3 @@
-"""Discover and describe documents for the course project.
-
-The functions in this module are intentionally left for students to complete.
-Read the tests in ``tests/test_catalog.py`` before implementing them.
-"""
-
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -21,40 +15,45 @@ class DocumentInfo:
 
 
 def is_supported_document(path: Path) -> bool:
-    """Return True when path is a regular file with a supported extension.
-
-    Extension matching must be case-insensitive. Directories are not documents.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement is_supported_document")
+    """Return True when path is a regular file with a supported extension."""
+    if not path.is_file():
+        return False
+    return path.suffix.lower() in SUPPORTED_EXTENSIONS
 
 
 def discover_documents(root: Path) -> list[Path]:
-    """Recursively find supported documents below root.
+    """Recursively find supported documents below root."""
+    if not root.exists():
+        return []
+    if not root.is_dir():
+        raise NotADirectoryError(f"{root} is not a directory")
 
-    Return paths rooted at root, sorted by their relative POSIX path.
-    Return an empty list when root does not exist. Raise NotADirectoryError when
-    root exists but is not a directory.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement discover_documents")
+    found_files = []
+    for item in root.rglob("*"):
+        if is_supported_document(item):
+            found_files.append(item)
+
+    return sorted(found_files, key=lambda p: p.relative_to(root).as_posix())
 
 
 def describe_document(path: Path, root: Path) -> DocumentInfo:
-    """Create metadata for path, using a path relative to root.
+    """Create metadata for path, using a path relative to root."""
+    if not is_supported_document(path):
+        raise ValueError(f"{path} is not a supported document")
 
-    Store the original filename, a POSIX relative path, a lower-case extension,
-    and the file size in bytes. Raise ValueError for unsupported files or paths
-    outside root.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement describe_document")
+    return DocumentInfo(
+        name=path.name,
+        relative_path=path.relative_to(root).as_posix(),
+        extension=path.suffix.lower(),
+        size_bytes=path.stat().st_size,
+    )
 
 
 def build_manifest(root: Path) -> list[DocumentInfo]:
-    """Return metadata for every supported document below root.
-
-    Use discover_documents and describe_document rather than duplicating logic.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement build_manifest")
+    """Compose the previous functions; do not duplicate their logic."""
+    documents = discover_documents(root)
+    manifest = []
+    for doc_path in documents:
+        info = describe_document(doc_path, root)
+        manifest.append(info)
+    return manifest
