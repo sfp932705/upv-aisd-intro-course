@@ -10,6 +10,14 @@ Complete `src/engineering_knowledge_assistant/catalog.py` so it scans a director
 of supported documents (`.pdf`, `.txt`, `.md`). The acceptance tests are provided; the four implementation functions
 contain TODOs.
 
+## Implemented behaviour
+
+The catalogue recursively finds regular `.pdf`, `.txt`, and `.md` files, regardless of extension case. It sorts them by their POSIX paths relative to the search root and records each file's original name, relative path, lowercase extension, and size in bytes.
+
+A missing search root returns an empty list. An existing root that is a file raises `NotADirectoryError`. Describing an unsupported file or a file outside the root raises `ValueError`.
+
+The two added tests cover a file with no extension and a file used as the search root.
+
 ## Requirements
 
 - Linux, macOS, or Windows with Ubuntu on WSL2

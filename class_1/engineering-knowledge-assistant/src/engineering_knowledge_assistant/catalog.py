@@ -26,7 +26,7 @@ def is_supported_document(path: Path) -> bool:
     Extension matching must be case-insensitive. Directories are not documents.
     TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement is_supported_document")
+    return path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS
 
 
 def discover_documents(root: Path) -> list[Path]:
@@ -37,7 +37,17 @@ def discover_documents(root: Path) -> list[Path]:
     root exists but is not a directory.
     TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement discover_documents")
+    if not root.exists():
+        return []
+    if not root.is_dir():
+        raise NotADirectoryError(root)
+
+    documents = []
+    for path in root.rglob("*"):
+        if is_supported_document(path):
+            documents.append(path)
+
+    return sorted(documents, key=lambda path: path.relative_to(root).as_posix())
 
 
 def describe_document(path: Path, root: Path) -> DocumentInfo:
@@ -48,7 +58,15 @@ def describe_document(path: Path, root: Path) -> DocumentInfo:
     outside root.
     TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement describe_document")
+    if not is_supported_document(path):
+        raise ValueError
+    relative_path = path.relative_to(root).as_posix()
+    return DocumentInfo(
+        name=path.name,
+        relative_path=relative_path,
+        extension=path.suffix.lower(),
+        size_bytes=path.stat().st_size,
+    )
 
 
 def build_manifest(root: Path) -> list[DocumentInfo]:
@@ -57,4 +75,7 @@ def build_manifest(root: Path) -> list[DocumentInfo]:
     Use discover_documents and describe_document rather than duplicating logic.
     TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement build_manifest")
+    manifest = []
+    for path in discover_documents(root):
+        manifest.append(describe_document(path, root))
+    return manifest

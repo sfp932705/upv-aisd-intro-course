@@ -99,3 +99,16 @@ def test_build_manifest_composes_discovery_and_description(tmp_path: Path) -> No
 
     assert [item.relative_path for item in manifest] == ["a.md", "b.txt"]
     assert [item.size_bytes for item in manifest] == [6, 5]
+
+
+def test_file_without_extension_is_rejected(tmp_path: Path) -> None:
+    document = tmp_path / "README"
+    document.write_text("example", encoding="utf-8")
+    assert is_supported_document(document) is False
+
+
+def test_discover_file_root_raises(tmp_path: Path) -> None:
+    root = tmp_path / "notes.txt"
+    root.write_text("example", encoding="utf-8")
+    with pytest.raises(NotADirectoryError):
+        discover_documents(root)
