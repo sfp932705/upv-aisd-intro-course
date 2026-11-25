@@ -56,6 +56,23 @@ Implement the four TODOs in `src/engineering_knowledge_assistant/catalog.py`:
 Read the tests before coding. They define the expected behavior. Do not weaken or edit the provided tests to make them
 pass. Add at least two extra tests for edge cases of your choice.
 
+## Implemented behavior
+
+`catalog.py` now provides:
+
+- `is_supported_document(path)` — `True` only for regular files ending in `.pdf`, `.txt` or `.md` (any case).
+  Directories are never documents, even if named like `notes.txt`.
+- `discover_documents(root)` — recursive search, sorted by relative POSIX path. A missing root yields `[]`; a root
+  that is a file raises `NotADirectoryError`.
+- `describe_document(path, root)` — returns `DocumentInfo(name, relative_path, extension, size_bytes)` with the
+  original filename, a POSIX path relative to `root`, a lower-case extension and the size in bytes. Both paths are
+  resolved first, so `root/../file.md` is correctly rejected as outside the root. Unsupported files also raise
+  `ValueError`.
+- `build_manifest(root)` — `describe_document` applied to every result of `discover_documents`.
+
+Additional tests cover: directories with a document extension, `..` traversal outside the root, upper-case extensions
+in nested folders, and a missing root passed to `build_manifest`.
+
 ## Suggested workflow
 
 ```bash

@@ -99,3 +99,43 @@ def test_build_manifest_composes_discovery_and_description(tmp_path: Path) -> No
 
     assert [item.relative_path for item in manifest] == ["a.md", "b.txt"]
     assert [item.size_bytes for item in manifest] == [6, 5]
+
+
+def test_directory_with_document_extension_is_skipped(tmp_path: Path) -> None:
+    (tmp_path / "notes.txt").mkdir()
+    (tmp_path / "notes.txt" / "inner.md").write_text("inner", encoding="utf-8")
+
+    found = discover_documents(tmp_path)
+
+    assert [path.relative_to(tmp_path).as_posix() for path in found] == [
+        "notes.txt/inner.md"
+    ]
+
+
+def test_describe_rejects_parent_traversal_outside_root(tmp_path: Path) -> None:
+    root = tmp_path / "root"
+    root.mkdir()
+    (tmp_path / "secret.md").write_text("secret", encoding="utf-8")
+    with pytest.raises(ValueError):
+        describe_document(root / ".." / "secret.md", root)
+
+
+def test_build_manifest_normalises_uppercase_extension(tmp_path: Path) -> None:
+    nested = tmp_path / "deep" / "er"
+    nested.mkdir(parents=True)
+    (nested / "README.MD").write_bytes(b"")
+
+    manifest = build_manifest(tmp_path)
+
+    assert manifest == [
+        DocumentInfo(
+            name="README.MD",
+            relative_path="deep/er/README.MD",
+            extension=".md",
+            size_bytes=0,
+        )
+    ]
+
+
+def test_build_manifest_missing_root_is_empty(tmp_path: Path) -> None:
+    assert build_manifest(tmp_path / "missing") == []
