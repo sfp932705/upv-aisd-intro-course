@@ -99,3 +99,29 @@ secrets, IDE caches or local data.
 4. Which edge cases did your additional tests cover?
 
 Submit the pull request URL and a short note about one bug or edge case you encountered.
+
+#Comentario añadido
+
+Setup
+Install dependencies:
+
+uv sync
+Commands
+Run tests:
+
+uv run pytest
+Run Ruff:
+
+uv run ruff check .
+Format code:
+
+uv run ruff format .
+Run MyPy:
+
+uv run mypy src
+Implemented behaviour
+Detect supported documents (.pdf, .txt, .md)
+Discover supported documents recursively
+Sort documents by relative POSIX path
+Generate document metadata
+Build a manifest from discovered documents

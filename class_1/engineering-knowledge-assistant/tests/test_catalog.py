@@ -99,3 +99,15 @@ def test_build_manifest_composes_discovery_and_description(tmp_path: Path) -> No
 
     assert [item.relative_path for item in manifest] == ["a.md", "b.txt"]
     assert [item.size_bytes for item in manifest] == [6, 5]
+
+#Test añadidos
+def test_build_manifest_empty_or_missing_root(tmp_path: Path) -> None:
+    assert build_manifest(tmp_path / "does_not_exist") == []
+
+
+def test_discover_ignores_directories_with_supported_extension(
+    tmp_path: Path,
+) -> None:
+    fake_pdf_dir = tmp_path / "tricky.pdf"
+    fake_pdf_dir.mkdir()
+    assert discover_documents(tmp_path) == []
