@@ -1,29 +1,32 @@
 minimum_pre_commit_version: "4.0.0"
-default_install_hook_types: [ pre-commit, commit-msg ]
+default_install_hook_types: [pre-commit, commit-msg]
 
 repos:
   - repo: local
     hooks:
       - id: ruff-check
         name: Ruff lint (src)
-        entry: uv run ruff check src
+        entry: bash -c 'cd class_1/engineering-knowledge-assistant && uv run ruff check src'
         language: system
         pass_filenames: false
         always_run: true
+
       - id: ruff-format
         name: Ruff format check (src)
-        entry: uv run ruff format --check src
+        entry: bash -c 'cd class_1/engineering-knowledge-assistant && uv run ruff format --check src'
         language: system
         pass_filenames: false
         always_run: true
+
       - id: mypy
         name: mypy type check (src and tests)
-        entry: uv run mypy src tests
+        entry: make -C class_1/engineering-knowledge-assistant lint-mypy
         language: system
         pass_filenames: false
         always_run: true
+
       - id: conventional-commit
         name: Conventional Commit message
-        entry: uv run python scripts/check_commit_message.py
+        entry: uv run --project class_1/engineering-knowledge-assistant python class_1/engineering-knowledge-assistant/scripts/check_commit_message.py
         language: system
-        stages: [ commit-msg ]
+        stages: [commit-msg]

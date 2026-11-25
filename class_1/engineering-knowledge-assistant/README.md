@@ -99,3 +99,39 @@ secrets, IDE caches or local data.
 4. Which edge cases did your additional tests cover?
 
 Submit the pull request URL and a short note about one bug or edge case you encountered.
+
+## Completed implementation
+
+The document catalogue recursively discovers `.pdf`, `.txt`, and `.md`
+files, accepting uppercase and lowercase extensions.
+
+Documents are sorted by their relative POSIX paths. Each manifest entry
+contains the original filename, relative path, lowercase extension,
+and file size in bytes.
+
+Missing root directories return an empty list. A root that is a file
+raises NotADirectoryError. Unsupported documents and paths outside
+the root raise ValueError.
+
+## Setup and checks
+
+Requirements: Python >= 3.12, uv, Git, and GNU Make.
+
+Run these commands from class_1/engineering-knowledge-assistant:
+
+```bash
+make install-test
+make format
+make lint
+make test
+```
+
+In VS Code, select `.venv/bin/python` as the Python interpreter.
+
+## Additional tests
+
+Two additional tests cover:
+- An empty folder produces an empty manifest.
+- A nonexistent PDF file is rejected.
+
+Validation: all 12 tests and the lint checks passed.

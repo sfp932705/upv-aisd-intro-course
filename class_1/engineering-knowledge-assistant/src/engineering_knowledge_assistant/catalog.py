@@ -23,38 +23,49 @@ class DocumentInfo:
 def is_supported_document(path: Path) -> bool:
     """Return True when path is a regular file with a supported extension.
 
-    Extension matching must be case-insensitive. Directories are not documents.
-    TODO: implement this function.
+    Extension matching must be case-insensitive. Directories are not documents
     """
-    raise NotImplementedError("TODO: implement is_supported_document")
+    return path.is_file() and path.suffix.lower() in SUPPORTED_EXTENSIONS
 
 
 def discover_documents(root: Path) -> list[Path]:
-    """Recursively find supported documents below root.
+    """Find supported documents recursively, sorted by relative POSIX path."""
+    if not root.exists():
+        return []
 
-    Return paths rooted at root, sorted by their relative POSIX path.
-    Return an empty list when root does not exist. Raise NotADirectoryError when
-    root exists but is not a directory.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement discover_documents")
+    if not root.is_dir():
+        raise NotADirectoryError(f"Not a directory: {root}")
+
+    documents = []
+
+    for path in root.rglob("*"):
+        if is_supported_document(path):
+            documents.append(path)
+
+    return sorted(documents, key=lambda path: path.relative_to(root).as_posix())
 
 
 def describe_document(path: Path, root: Path) -> DocumentInfo:
-    """Create metadata for path, using a path relative to root.
+    """Create metadata for path, using a path relative to root."""
+    if not is_supported_document(path):
+        raise ValueError(f"Unsupported document: {path}")
 
-    Store the original filename, a POSIX relative path, a lower-case extension,
-    and the file size in bytes. Raise ValueError for unsupported files or paths
-    outside root.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement describe_document")
+    relative_path = path.resolve().relative_to(root.resolve())
+
+    return DocumentInfo(
+        name=path.name,
+        relative_path=relative_path.as_posix(),
+        extension=path.suffix.lower(),
+        size_bytes=path.stat().st_size,
+    )
 
 
 def build_manifest(root: Path) -> list[DocumentInfo]:
-    """Return metadata for every supported document below root.
+    """Return metadata for every supported document below root."""
+    manifest = []
 
-    Use discover_documents and describe_document rather than duplicating logic.
-    TODO: implement this function.
-    """
-    raise NotImplementedError("TODO: implement build_manifest")
+    for path in discover_documents(root):
+        info = describe_document(path, root)
+        manifest.append(info)
+
+    return manifest

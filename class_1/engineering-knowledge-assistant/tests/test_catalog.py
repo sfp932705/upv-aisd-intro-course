@@ -99,3 +99,13 @@ def test_build_manifest_composes_discovery_and_description(tmp_path: Path) -> No
 
     assert [item.relative_path for item in manifest] == ["a.md", "b.txt"]
     assert [item.size_bytes for item in manifest] == [6, 5]
+
+
+def test_empty_folder_returns_empty_manifest(tmp_path: Path) -> None:
+    assert build_manifest(tmp_path) == []
+
+
+def test_missing_file_is_not_supported(tmp_path: Path) -> None:
+    missing_file = tmp_path / "missing.pdf"
+
+    assert is_supported_document(missing_file) is False
