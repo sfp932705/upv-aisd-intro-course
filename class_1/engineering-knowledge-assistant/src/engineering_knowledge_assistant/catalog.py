@@ -24,9 +24,8 @@ def is_supported_document(path: Path) -> bool:
     """Return True when path is a regular file with a supported extension.
 
     Extension matching must be case-insensitive. Directories are not documents.
-    TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement is_supported_document")
+    return path.suffix.lower() in SUPPORTED_EXTENSIONS and not path.is_dir()
 
 
 def discover_documents(root: Path) -> list[Path]:
@@ -37,7 +36,12 @@ def discover_documents(root: Path) -> list[Path]:
     root exists but is not a directory.
     TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement discover_documents")
+    if not root.exists():
+        return []
+    if not root.is_dir():
+        raise NotADirectoryError
+    docs = [f for f in root.rglob("*") if is_supported_document(f)]
+    return sorted(docs, key=lambda x: x.relative_to(root))
 
 
 def describe_document(path: Path, root: Path) -> DocumentInfo:
@@ -46,15 +50,20 @@ def describe_document(path: Path, root: Path) -> DocumentInfo:
     Store the original filename, a POSIX relative path, a lower-case extension,
     and the file size in bytes. Raise ValueError for unsupported files or paths
     outside root.
-    TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement describe_document")
+    if not is_supported_document(path):
+        raise ValueError
+    return DocumentInfo(
+        name=path.name,
+        relative_path=path.relative_to(root).as_posix(),
+        extension=path.suffix.lower(),
+        size_bytes=path.stat().st_size,
+    )
 
 
 def build_manifest(root: Path) -> list[DocumentInfo]:
     """Return metadata for every supported document below root.
 
     Use discover_documents and describe_document rather than duplicating logic.
-    TODO: implement this function.
     """
-    raise NotImplementedError("TODO: implement build_manifest")
+    return [describe_document(x, root) for x in discover_documents(root)]
