@@ -1,29 +1,31 @@
 minimum_pre_commit_version: "4.0.0"
 default_install_hook_types: [ pre-commit, commit-msg ]
 
+# The Git root is the course repository, so hooks start there. Each command
+# moves into the project directory (uv --directory) before running.
 repos:
   - repo: local
     hooks:
       - id: ruff-check
         name: Ruff lint (src)
-        entry: uv run ruff check src
+        entry: uv run --directory class_1/engineering-knowledge-assistant ruff check src
         language: system
         pass_filenames: false
         always_run: true
       - id: ruff-format
         name: Ruff format check (src)
-        entry: uv run ruff format --check src
+        entry: uv run --directory class_1/engineering-knowledge-assistant ruff format --check src
         language: system
         pass_filenames: false
         always_run: true
       - id: mypy
         name: mypy type check (src and tests)
-        entry: uv run mypy src tests
+        entry: uv run --directory class_1/engineering-knowledge-assistant mypy src tests
         language: system
         pass_filenames: false
         always_run: true
       - id: conventional-commit
         name: Conventional Commit message
-        entry: uv run python scripts/check_commit_message.py
+        entry: uv run --project class_1/engineering-knowledge-assistant python class_1/engineering-knowledge-assistant/scripts/check_commit_message.py
         language: system
         stages: [ commit-msg ]

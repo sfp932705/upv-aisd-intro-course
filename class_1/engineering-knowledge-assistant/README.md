@@ -42,6 +42,28 @@ make clean         # remove local caches and coverage output
 
 `make lint` should pass on the starter. The tests are expected to fail until you implement the TODO functions.
 
+## Implemented behavior
+
+`src/engineering_knowledge_assistant/catalog.py` scans a directory and builds a
+deterministic manifest of supported documents (`.pdf`, `.txt`, `.md`):
+
+- `is_supported_document(path)`: `True` only for regular files whose extension
+  is supported; matching is case-insensitive (`manual.PDF` is accepted) and
+  directories are never documents.
+- `discover_documents(root)`: recursively finds supported files, sorted by
+  relative POSIX path. Returns `[]` if `root` does not exist and raises
+  `NotADirectoryError` if `root` is a file.
+- `describe_document(path, root)`: returns a `DocumentInfo` with the original
+  filename, relative POSIX path, lower-case extension and size in bytes. Raises
+  `ValueError` for unsupported files or paths outside `root`.
+- `build_manifest(root)`: composes the two functions above.
+
+Print a manifest as JSON from the command line:
+
+```bash
+uv run python -m engineering_knowledge_assistant path/to/documents
+```
+
 ## Your tasks
 
 Implement the four TODOs in `src/engineering_knowledge_assistant/catalog.py`:
